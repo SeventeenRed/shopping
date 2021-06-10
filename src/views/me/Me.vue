@@ -1,11 +1,13 @@
 <template>
-    <h2>关于我</h2>
+  <div>
+    <h2>我的</h2>
+  </div>
 </template>
 
 <script>
-    export default {
-        name: "Me"
-    }
+export default {
+  name: "share"
+}
 </script>
 
 <style scoped>

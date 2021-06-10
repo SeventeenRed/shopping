@@ -1,17 +1,9 @@
-import {request} from './request'
+//导入reques网络封装
+import {request} from "@/network/request";
 
-export function getHomeMultiData() {
+//封装多个数据
+export function getHomeMultidata(){
   return request({
-    url:'/test/getBanners'
-  });
-}
-
-export function getGoodsData(type, page) {
-  return request({
-    url:'/test/getGoods',
-    params:{
-      type,
-      page
-    }
-  });
+    url:'/home/multidata',
+  })
 }

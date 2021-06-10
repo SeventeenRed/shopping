@@ -31,7 +31,8 @@
     export default {
         name: "MainTarBar",
         components: {
-            TarBar,TarBarItem
+          TarBar,
+          TarBarItem
         }
     }
 </script>

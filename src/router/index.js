@@ -1,21 +1,25 @@
+//导入架包
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import VueRouter from "vue-router";
 
-// 懒加载
-const Home = () => import('views/home/Home')
-const Category = () => import('views/category/Category')
-const Cart = () => import('views/cart/Cart')
-const Me = () => import('views/me/Me')
+//创建懒加载
+const Home = ()=> import('../views/home/Home')
+const Category = ()=> import('../views/category/Category')
+const Cart = ()=> import('../views/cart/Cart')
 
+//安装插件
 Vue.use(VueRouter)
-const routes = [
+
+//创建数组用于存储
+const routes=[
   {
-    path: '',
-    redirect: '/home'
+    //命名
+    path:'',
+    //重定向
+    redirect:'/home'
   },
   {
     path: '/home',
-    // 指定的组件
     component:Home
   },
   {
@@ -28,13 +32,18 @@ const routes = [
   },
   {
     path: '/me',
-    component:Me
+    //懒加载
+    component: ()=> import('../views/me/Me')
   }
 ]
-const router = new VueRouter({
+
+//创建对象
+const router=new VueRouter({
+  //将数组存储的放入路由中
   routes,
-  // url模式
+  //设置导航栏模式 history模式 /home前面没有 /#/home | hash模式 前面有/#/home
   mode:'history'
 })
 
+//导出
 export default router
