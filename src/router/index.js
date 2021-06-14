@@ -6,6 +6,7 @@ import VueRouter from "vue-router";
 const Home = ()=> import('../views/home/Home')
 const Category = ()=> import('../views/category/Category')
 const Cart = ()=> import('../views/cart/Cart')
+const Detail = ()=> import('../views/detail/Detail')
 
 //安装插件
 Vue.use(VueRouter)
@@ -34,6 +35,11 @@ const routes=[
     path: '/me',
     //懒加载
     component: ()=> import('../views/me/Me')
+  },
+  {
+    //动态路由 获取详情数据
+    path: '/detail:iid',
+    component:Detail
   }
 ]
 

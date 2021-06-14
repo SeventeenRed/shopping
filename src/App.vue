@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view/>
+<!--    不让首页随便进行销毁 exclude去除 | 不包括 -->
+    <keep-alive exclude="Detail">
+      <router-view/>
+    </keep-alive>
     <main-tar-bar/>
   </div>
 </template>

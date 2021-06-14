@@ -5,6 +5,9 @@ import router from "@/router";
 
 Vue.config.productionTip = false
 
+//创建一个bus事件
+Vue.prototype.$bus =new Vue()
+
 new Vue({
   render: h => h(App),
   //挂载router

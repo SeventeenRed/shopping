@@ -9,7 +9,7 @@ export function request(config){
     // baseURL:'http://123.207.32.32:8000',
     baseURL:'http://152.136.185.210:7878/api/m5',
     //时间
-    timeout:2000
+    timeout:1000
   })
 
   //2.axios拦截器

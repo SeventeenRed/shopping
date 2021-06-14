@@ -3,22 +3,28 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-
+    <tab-control :titles="['流行','新款','精选']"
+                 @tabClick="tabClick"
+                 ref="tabControl1"
+                 class="tab-control"
+                 v-show="isTabFixed"/>
     <scroll class="content"
             ref="scroll"
             :probe-type="3"
             @scroll="contentscroll"
             :pull-up-load="true"
-            @pullingUp="loadMore"
-    >
+            @pullingUp="loadMore">
+
       <!--    轮播图-->
-      <home-swiper :banners='banners'/>
+      <home-swiper :banners='banners' @swiperImageLoad="swiperImageLoad"/>
       <!--    推荐信息-->
       <recommen-view :recommends="recommends"/>
       <!--    流行推荐-->
       <feature-view/>
       <!--    商品分类-->
-      <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"/>
+      <tab-control :titles="['流行','新款','精选']"
+                   @tabClick="tabClick"
+                   ref="tabControl2"/>
       <!--    商品内容-->
       <goods-list :goods="showGoods"/>
     </scroll>
@@ -48,6 +54,8 @@ import BackTop from "components/contents/backTop/BackTop";
 //当导出不是default是 需要用{}进行命名
 //网络请求数据
 import {getHomeMultidata,getHomeGoods} from "network/home";
+//导入防止页面抖动
+import {debounce} from "common/utils";
 
 
 export default {
@@ -77,7 +85,12 @@ export default {
       },
       currentType:'pop',
       //当传入的值小于一千时 默认false 则 大于 显示 true
-      isShowBackTop:false
+      isShowBackTop:false,
+      //保存吸顶效果位置
+      tabOffsetTop: 0,
+      //决定首页是否吸顶  默认不吸顶
+      isTabFixed:true,
+      saveY:0
     }
   },
   computed:{
@@ -85,6 +98,17 @@ export default {
     showGoods() {
       return this.goods[this.currentType].list;
     }
+  },
+  activated() {
+    // 当前的位置
+    this.$refs.scroll.scrollTo(0,this.saveY,0)
+    //刷新
+    this.$refs.scroll.refresh()
+  },
+  deactivated() {
+    //保存当前的函数
+    this.saveY = this.$refs.scroll.getScrollY()
+    // console.log(this.saveY)
   },
   //创建生命周期 当已加载就进行请求数据
   created() {
@@ -97,34 +121,61 @@ export default {
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
+
+  },
+  mounted() {
+    //1.监听item中图片加载完成
+    const refresh = debounce(this.$refs.scroll.refresh,50)
+    this.$bus.$on('itemImageLoad',() => {
+      refresh()
+    })
+    // this.$bus.$on('itemImageLoad',()=>{
+    //   // console.log('-----')
+    //   this.$refs.scroll.refresh()
+    // })
+
+    //2.获取tabControl的offsetTop
+    //所有组件都有个属性$el:用于获取组件中的元素
+    // this.tabOffsetTop = this.$refs.tabControl.offsetTop
   },
   methods:{
     /**
      * 事件监听相关的方法
      */
+
     tabClick(index){
       // console.log(index)
-      this.currentType=Object.keys(this.goods)[index]
+      // this.currentType=Object.keys(this.goods)[index]
 
-      // switch (index){
-      //   case 0:
-      //     this.currentType='pop'
-      //     break
-      //   case 1:
-      //     this.currentType='new'
-      //     break
-      //   case 2:
-      //     this.currentType='sell'
-      // }
+      switch (index){
+        case 0:
+          this.currentType='pop'
+          break
+        case 1:
+          this.currentType='new'
+          break
+        case 2:
+          this.currentType='sell'
+      }
+      this.$refs.tabControl1.currentIndex=index;
+      this.$refs.tabControl2.currentIndex=index;
     },
     contentscroll(position){
       // console.log(position)
       // position.y < 1000  y轴 大于一千 显示回到顶部  小于则不显示 按键
+      //1.判断BackTop是否显示  | 判断上拉加载图标是否显示
       this.isShowBackTop = (-position.y) > 1000
+
+      //2.决定tabControl是否吸顶（position:fixed） | 决定首页分类是否吸顶
+      this.isTabFixed = (-position.y) > this.tabOffsetTop
     },
     loadMore(){
       // console.log('上拉加载')
       this.getHomeGoods(this.currentType)
+    },
+    swiperImageLoad(){
+      // console.log(this.$refs.tabControl.$el.offsetTop)
+      this.tabOffsetTop=this.$refs.tabControl2.$el.offsetTop
     },
 
     /**
@@ -153,6 +204,7 @@ export default {
         this.goods[type].list.push(...res.data.list)
         this.goods[type].page+=1
 
+        //因为scroll只能加载一次，所以需要调用finishPullUp 加载更多
         this.$refs.scroll.finishPullUp()
       })
     },
@@ -180,19 +232,18 @@ export default {
     color: #fff;
 
     /*固定定位*/
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
+    /*position: fixed;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    /*top: 0;*/
     /*层叠样式*/
-    z-index: 9;
+    /*z-index: 9;*/
   }
 
   .tab-control{
-    /*粘贴定位  滚动到某个位置是 进行粘贴  例如头部44是 粘贴*/
-    position: sticky;
-    top: 44px;
-    /*设置层次*/
+    /*相对定位*/
+    position: relative;
+    /*重叠样式*/
     z-index: 9;
   }
 
