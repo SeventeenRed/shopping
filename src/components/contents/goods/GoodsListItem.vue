@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="" @load="imageLoad" @click="itemClick"/>
+    <img :src="showImage" alt="" @load="imageLoad" @click="itemClick"/>
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -22,12 +22,25 @@ export default {
       }
     }
   },
+  computed:{
+    showImage(){
+      return this.goodsItem.image || this.goodsItem.show.img || this.goodsItem.show.image
+    }
+  },
   methods:{
     //监听实现图片加载完成
     imageLoad(){
       // console.log('imageLoad')
       //发射监听的事件
       this.$bus.$emit('itemImageLoad')
+
+      //通过路由监听 进行判断 当有/home时 进行监听判断 避免在另一个布局中监听到
+      // if(this.$route.path.indexOf('/home')){
+      //   this.$bus.$emit('homeItemImageLoad')
+      // }else if(this.$route.path.indexOf('/detail')){
+      //   //当另一个布局需要监听时 创建另一个监听对象
+      //   this.$bus.$emit('detailItemImageLoad')
+      // }
     },
     itemClick(){
       // console.log('跳转到详情')

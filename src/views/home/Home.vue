@@ -109,6 +109,9 @@ export default {
     //保存当前的函数
     this.saveY = this.$refs.scroll.getScrollY()
     // console.log(this.saveY)
+
+    //取消全局事件监听
+    this.$bus.$off('itemImageLoad')
   },
   //创建生命周期 当已加载就进行请求数据
   created() {

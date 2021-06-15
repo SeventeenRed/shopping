@@ -14,6 +14,10 @@
       <detail-images-info :images-info="detailInfo" @imageLoad="imageLoad"/>
       <!--    商品信息-->
       <detail-param-info :param-info="parmInfo"/>
+      <!--    商品评论信息-->
+      <detail-comment-info :comment-info="commentInfo"/>
+      <!--    推荐信息-->
+      <goods-list :goods="recommends"/>
     </scroll>
   </div>
 </template>
@@ -29,13 +33,19 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailImagesInfo from "./childComps/DetailImagesInfo";
 //商品信息
 import DetailParamInfo from "./childComps/DetailParamInfo";
+//商品评论信息
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
 
 //滚动样式
 import Scroll from "components/common/scroll/Scroll";
+//导入推荐的组件
+import GoodsList from "components/contents/goods/GoodsList";
 
 
 //网络请求数据
-import {getDetail,Goods,Shop,GoodsParam} from "network/detail";
+import {getDetail,Goods,Shop,GoodsParam,getRecommend} from "network/detail";
+import {debounce} from "common/utils";
+import {itemListenerMixin} from "common/mixin";
 
 export default {
   name: "Detail",
@@ -44,10 +54,14 @@ export default {
     DetailSwiper,
     DetailBaseInfo,
     DetailShopInfo,
-    Scroll,
     DetailImagesInfo,
-    DetailParamInfo
+    DetailParamInfo,
+    DetailCommentInfo,
+
+    Scroll,
+    GoodsList
   },
+  mixin:[itemListenerMixin],
   data(){
     return{
       //保存传输过来的iid数据
@@ -58,7 +72,10 @@ export default {
       goods: {},
       shop: {},
       detailInfo:{},
-      parmInfo:{}
+      parmInfo:{},
+      commentInfo:{},
+      recommends:[],
+      itemImgListener:null
     }
   },
   created() {
@@ -68,7 +85,7 @@ export default {
 
     //2.根据iid请求详情数据
     getDetail(this.iid).then(res=>{
-      console.log(res)
+      // console.log(res)
 
       const data=res.result;
 
@@ -88,6 +105,17 @@ export default {
       //5.获取参数信息
       this.parmInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule)
 
+      //获取商品评论信息
+      if(data.rate.cRate != 0){
+        this.commentInfo = data.rate.list[0]
+      }
+    })
+
+    //3.请求推荐信息
+    getRecommend().then(res=>{
+      console.log(res)
+      //将推荐信息存储到一个数组中
+      this.recommends = res.data.list
     })
   },
   methods:{

@@ -1,12 +1,13 @@
 <template>
   <div class="param-info" v-if="Object.keys(paramInfo).length !== 0">
     <p>参数信息</p>
+<!--    尺码-->
     <table :key="index" class="info-size" v-for="(table, index) in paramInfo.sizes">
       <tr :key="indey" v-for="(tr, indey) in table">
         <td :key="indez" v-for="(td, indez) in tr">{{ td }}</td>
       </tr>
     </table>
-
+<!--    详情-->
     <table class="info-param">
       <tr :key="index" v-for="(info, index) in paramInfo.infos">
         <td class="info-param-key">{{ info.key }}</td>
